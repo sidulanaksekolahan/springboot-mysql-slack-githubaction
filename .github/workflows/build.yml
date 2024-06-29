@@ -17,7 +17,7 @@ jobs:
         ports:
           - 3306:3306
         env:
-          MYSQL_ROOT_PASSWORD: pass
+          MYSQL_ROOT_PASSWORD: Qwerty_123!#
           MYSQL_DATABASE: demo
         options: >-
           --health-cmd "mysqladmin ping -h localhost"
@@ -45,7 +45,7 @@ jobs:
         run: mvn clean install
 
       - name: Build Docker image
-        run: docker build . -t your-dockerhub-username/your-app-name:${{ github.sha }}
+        run: docker build . -t mirfanduri/springboot-mysql-slack-githubaction:${{ github.sha }}
 
       - name: Run tests
         run: mvn test
@@ -57,4 +57,4 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
       - name: Push Docker image
-        run: docker push your-dockerhub-username/your-app-name:${{ github.sha }}
+        run: docker push mirfanduri/springboot-mysql-slack-githubaction:${{ github.sha }}
