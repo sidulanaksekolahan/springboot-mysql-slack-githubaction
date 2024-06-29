@@ -26,6 +26,14 @@ jobs:
           --health-retries 3
 
     steps:
+      - uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
+          text: 'CI ongoing... :eyes:'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
       - name: Checkout code
         uses: actions/checkout@v3
 
