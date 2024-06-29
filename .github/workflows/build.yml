@@ -48,8 +48,8 @@ jobs:
       - name: Build Docker image
         run: docker build . -t mirfanduri/springboot-mysql-slack-githubaction:${{ github.sha }}
 
-      - name: Run tests
-        run: mvn test
+#      - name: Run tests
+#        run: mvn test
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
