@@ -55,6 +55,18 @@ jobs:
 
       - name: Run tests
         run: mvn test -e -X
+        continue-on-error: true
+        id: test-step
+
+      - name: Send Slack notification on test failure
+        if: failure() && steps.test-step.outcome == 'failure'
+        uses: 8398a7/action-slack@v3
+        with:
+          status: failure()
+          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
+          text: ':x: Test step failed'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
       - name: Build Docker image
         if: success()
