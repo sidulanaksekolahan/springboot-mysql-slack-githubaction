@@ -59,7 +59,7 @@ jobs:
         id: test-step
 
       - name: Send Slack notification on test failure
-        if: steps.test-step.outcome == 'failure'
+        if: failure() && steps.test-step.outcome == 'failure'
         uses: 8398a7/action-slack@v3
         with:
           status: failure()
@@ -69,16 +69,36 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
       - name: Build Docker image
-        if: success()
+        if: success() && steps.test-step.outcome == 'success'
         run: docker build . -t mirfanduri/springboot-mysql-slack-githubaction:${{ github.sha }}
 
       - name: Log in to Docker Hub
-        if: success()
+        if: success() && steps.test-step.outcome == 'success'
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
       - name: Push Docker image
-        if: success()
+        if: success() && steps.test-step.outcome == 'success'
         run: docker push mirfanduri/springboot-mysql-slack-githubaction:${{ github.sha }}
+
+      - name: Send Slack notification on success
+        if: success() && steps.test-step.outcome == 'success'
+        uses: 8398a7/action-slack@v3
+        with:
+          status: success()
+          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
+          text: ':tada: Build successful!'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Always notify Slack at the end
+        if: always()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
+          text: ':x: CI finished with status: ${{ job.status }}'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
