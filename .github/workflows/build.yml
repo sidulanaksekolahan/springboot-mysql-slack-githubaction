@@ -55,40 +55,28 @@ jobs:
 
       - name: Run tests
         run: mvn test -e -X
-        continue-on-error: true
-        id: test-step
-
-      - name: Send Slack notification on test failure
-        if: failure() && steps.test-step.outcome == 'failure'
-        uses: 8398a7/action-slack@v3
-        with:
-          status: failure()
-          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
-          text: ':x: Run testing failed'
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
       - name: Build Docker image
-        if: success() && steps.test-step.outcome == 'success'
+        if: success()
         run: docker build . -t mirfanduri/springboot-mysql-slack-githubaction:${{ github.sha }}
 
       - name: Log in to Docker Hub
-        if: success() && steps.test-step.outcome == 'success'
+        if: success()
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
       - name: Push Docker image
-        if: success() && steps.test-step.outcome == 'success'
+        if: success()
         run: docker push mirfanduri/springboot-mysql-slack-githubaction:${{ github.sha }}
 
       - name: Send Slack notification
-        if: success() && steps.test-step.outcome == 'success'
+        if: always()
         uses: 8398a7/action-slack@v3
         with:
-          status: success()
+          status: ${{ job.status }}
           fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
-          text: ':tada: Build and deployment successful! http://springbootreactfullstack-env.eba-3imjbkem.eu-west-1.elasticbeanstalk.com'
-          env:
-            SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          text: ':tada: :arrow_right: CI Done...'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
