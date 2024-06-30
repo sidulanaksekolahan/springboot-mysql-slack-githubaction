@@ -43,6 +43,9 @@ jobs:
           distribution: 'adopt'  # Specify the Java distribution
           java-version: '11'
 
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml
+
       - name: Wait for MySQL to be ready
         run: |
           for i in `seq 1 30`; do
@@ -61,13 +64,19 @@ jobs:
 #          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
 #          restore-keys: ${{ runner.os }}-maven
 
-      - name: Build with Maven
-        run: mvn clean package -e -X
+#      - name: Build with Maven
+#        run: mvn clean package -e -X
 
       - name: Run tests
         run: mvn test -e -X 2>&1 | tee test-output.log
         continue-on-error: true
         id: test-step
+
+      - name: Archive test reports
+        uses: actions/upload-artifact@v2
+        with:
+          name: surefire-reports
+          path: target/surefire-reports
 
       - name: Read test log
         if: steps.test-step.outcome == 'failure'
