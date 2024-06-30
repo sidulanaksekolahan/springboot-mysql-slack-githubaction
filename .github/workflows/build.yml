@@ -20,7 +20,8 @@ jobs:
           MYSQL_ROOT_PASSWORD: Qwerty_123!#
           MYSQL_DATABASE: demo
         options: >-
-          --health-cmd "mysqladmin ping -h localhost"
+#          --health-cmd "mysqladmin ping -h localhost"
+          --health-cmd="mysqladmin ping --silent"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 3
@@ -54,7 +55,7 @@ jobs:
         run: mvn clean package -e -X
 
       - name: Run tests
-        run: mvn test -e -X
+        run: mvn clean test -e -X
         continue-on-error: true
         id: test-step
 
