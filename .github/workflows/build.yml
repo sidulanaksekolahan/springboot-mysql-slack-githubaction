@@ -82,13 +82,3 @@ jobs:
       - name: Push Docker image
         if: success()
         run: docker push mirfanduri/springboot-mysql-slack-githubaction:${{ github.sha }}
-
-      - name: Send Slack notification
-        if: always()
-        uses: 8398a7/action-slack@v3
-        with:
-          status: ${{ job.status }}
-          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
-          text: ':tada: :arrow_right: CI Done...'
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
