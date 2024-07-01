@@ -10,7 +10,7 @@ class SpringbootMysqlSlackGithubactionApplicationTests {
 	@Test
 	void contextLoads() {
 		String x = "x";
-		Assertions.assertEquals("x", x);
+		Assertions.assertEquals("z", x);
 	}
 
 }
